@@ -47,6 +47,8 @@ pip install -r requirements.txt
 ```bash
 python Module1.py
 ```
+---
+
 ## Author
 * Name: David Morse
 * Email: dmmorse3@gmail.com
