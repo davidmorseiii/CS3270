@@ -1,11 +1,20 @@
 # Weather App
-Module one of a semester long weather app project.
+A semester long weather app project for CS 3270.
 
 ---
-
 ## Description
-Fetches weather data from a CSV file and stores it in Python data structures.
 
+### Phase 1: Optimal Python Development Lifecycle
+#### Fetches weather data from a CSV file and stores it in Python data structures.
+
+* New features incorporated:
+  * File I/O: Implemented logic to read CSV files using the pandas library.
+  * Data Structuring: Converted data into Python list of dictionaries for easy iteration/access.
+  * Validation: Added check for empty dataset before processing
+* How they meet phase expectations:
+  * The project now successfully fetches data from a CSV and stores it in internal Python structures.
+    The code is also documented using docstrings and inline comments.
+    The modular design prepares it for future phases.
 ---
 
 ## Requirements
