@@ -16,12 +16,18 @@ A semester long weather app project for CS 3270.
     The code is also documented using docstrings and inline comments.
     The modular design prepares it for future phases.
 ---
+## Project Setup
+- IDE: PyCharm Professional
+- Environment: Windows 11
+- Source Control: GitHub
+- Notes: I have been using Linux with VS Code to program for several years now and I realized that I'm not nearly as comfortable in Windows as I want to be.
+  I'm choosing to work in Windows and try a new IDE this semester to strengthen my confidence in Windows and learn something new.
 
+---
 ## Requirements
 - Python 3.8 or higher
 
 ---
-
 ## Getting Started
 
 ### 1. Clone the repository
@@ -57,7 +63,6 @@ pip install -r requirements.txt
 python Module1.py
 ```
 ---
-
 ## Author
 * Name: David Morse
 * Email: dmmorse3@gmail.com
