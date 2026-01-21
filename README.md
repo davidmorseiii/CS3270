@@ -4,17 +4,17 @@ A semester long weather app project for CS 3270.
 ---
 ## Description
 
-### Phase 1: Optimal Python Development Lifecycle
-#### Fetches weather data from a CSV file and stores it in Python data structures.
+### Phase 2: Modularization
+#### Fetches weather data from CSV, cleans it, and calculates descriptive statistics using a modular architecture.
 
 * New features incorporated:
-  * File I/O: Implemented logic to read CSV files using the pandas library.
-  * Data Structuring: Converted data into Python list of dictionaries for easy iteration/access.
-  * Validation: Added check for empty dataset before processing
+  * Modularization: Split the code into a structured Python package (weather_analysis) with separate modules for input/output (load_csv_to_df.py), math (analytics.py), and data formatting (data_cleaning.py).
+  * Descriptive Statistics: Added functions to calculate mean, median, and range of weather min and max temps.
+  * Packaging: Created a setup.py file to allow the code to be installed via pip.
+  * Reusability: With analysis logic decoupled from the data loading, the stats functions can work with any list of numbers.
 * How they meet phase expectations:
-  * The project now successfully fetches data from a CSV and stores it in internal Python structures.
-    The code is also documented using docstrings and inline comments.
-    The modular design prepares it for future phases.
+  * Descriptive Stats: The analytics.py module explicitly handles calculation of several of the suggested statistics.
+  * Install and Use: The project can now be installed using pip install . and imported into other scripts using standard import statements.
 ---
 ## Project Setup
 - IDE: PyCharm Professional
@@ -53,14 +53,14 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-### 4. Install dependencies
+### 4. Install the package
 ```bash
-pip install -r requirements.txt
+pip install .
 ```
 
 ### 5. Run the program
 ```bash
-python load_csv_to_df.py
+python main.py
 ```
 ---
 ## Author
