@@ -60,7 +60,7 @@ pip install -r requirements.txt
 
 ### 5. Run the program
 ```bash
-python Module1.py
+python load_csv_to_df.py
 ```
 ---
 ## Author
