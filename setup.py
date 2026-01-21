@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='CS3270',
+    name='weather_analysis',
     version='0.1',
     packages=find_packages(),
     description='Simple tool for analyzing weather data CSV',
