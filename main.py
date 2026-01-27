@@ -5,29 +5,30 @@ def main():
     print("-- Weather Analysis --")
 
     try:
-        #1. Load data
-        data = wa.load_weather_data(file_name)
-        print(f"Total rows: {len(data)}")
+        # 1. Create the WeatherDataset object to handle loading its own data
+        dataset = wa.WeatherDataset(file_name)
+        print(f"Total rows: {dataset.get_row_count()}")
 
-        #2. Extract and clean data
-        max_temps = wa.extract_valid_temperatures(data, 'MaxTemp')
-        min_temps = wa.extract_valid_temperatures(data, 'MinTemp')
-
-        #3. Calculate and display stats for MaxTemp
-        if max_temps:
+        # 2. Analyze MaxTemp
+        # ask the object for the stats rather than calculating manually here
+        max_stats = dataset.get_column_statistics('MaxTemp')
+        
+        if max_stats:
             print("\n-- MaxTemp Statistics --")
-            print(f'Mean:   {wa.calculate_mean(max_temps):.2f}')
-            print(f'Median: {wa.calculate_median(max_temps):.2f}')
-            print(f'Range:  {wa.calculate_range(max_temps):.2f}')
+            print(f"Mean:   {max_stats['mean']:.2f}")
+            print(f"Median: {max_stats['median']:.2f}")
+            print(f"Range:  {max_stats['range']:.2f}")
         else:
             print("Error: no valid MaxTemp data found.")
 
-        #4. Calculate and display stats for MinTemp
-        if min_temps:
+        # 3. Analyze MinTemp
+        min_stats = dataset.get_column_statistics('MinTemp')
+        
+        if min_stats:
             print("\n-- MinTemp Statistics --")
-            print(f'Mean:   {wa.calculate_mean(min_temps):.2f}')
-            print(f'Median: {wa.calculate_median(min_temps):.2f}')
-            print(f'Range:  {wa.calculate_range(min_temps):.2f}')
+            print(f"Mean:   {min_stats['mean']:.2f}")
+            print(f"Median: {min_stats['median']:.2f}")
+            print(f"Range:  {min_stats['range']:.2f}")
         else:
             print("Error: no valid MinTemp data found.")
 

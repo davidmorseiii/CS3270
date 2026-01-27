@@ -15,7 +15,7 @@ def extract_valid_temperatures(data, column_name):
     if not data:
         raise ValueError("Can't extract temperatures from empty dataset")
 
-    # Verify column exists in first row
+    # verify column exists in first row
     if column_name not in data[0]:
         raise ValueError(f"Column '{column_name}' not found in dataset")
 
