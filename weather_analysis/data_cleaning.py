@@ -10,7 +10,7 @@ def extract_valid_temperatures(data, column_name):
     Returns:
         List of valid temp values (floats)
     Raises:
-        ValueError: If data is empty or column_name doesnt exist in data
+        ValueError: If data is empty or column_name doesn't exist in data
     """
     if not data:
         raise ValueError("Can't extract temperatures from empty dataset")
