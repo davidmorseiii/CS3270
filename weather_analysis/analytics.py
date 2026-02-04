@@ -8,12 +8,10 @@ def calculate_mean(values):
         Mean value (float) or 0 if list is empty
     """
     if not values:
-        return 0
+        raise ValueError("Can't calculate mean of empty list")
 
     # sum divided by count
-    total = sum(values)
-    count = len(values)
-    return total / count
+    return sum(values) / len(values)
 
 def calculate_median(values):
     """
@@ -24,7 +22,7 @@ def calculate_median(values):
         Median value (float), or 0 if list is empty
     """
     if not values:
-        return 0
+        raise ValueError("Can't calculate median of empty list")
 
     sorted_values = sorted(values)
     n = len(sorted_values)
@@ -47,6 +45,6 @@ def calculate_range(values):
         Range value (float), or 0 if list is empty
     """
     if not values:
-        return 0
+        raise ValueError("Can't calculate range of empty list")
 
     return max(values) - min(values)
