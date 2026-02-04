@@ -34,7 +34,7 @@ def main():
         logger.info("Analyzing MinTemp column")
         min_stats = dataset.get_column_statistics('MinTemp')
 
-        print("\n-- MinTemp Statistics --")
+        print("-- MinTemp Statistics --")
         print(f"Mean:   {min_stats['mean']:.2f}")
         print(f"Median: {min_stats['median']:.2f}")
         print(f"Range:  {min_stats['range']:.2f}")
