@@ -1,5 +1,4 @@
 import math
-
 # originally did this in main() but got messy so decided it needed its own function
 def extract_valid_numeric_values(data, column_name):
     """
@@ -19,10 +18,10 @@ def extract_valid_numeric_values(data, column_name):
     if column_name not in data[0]:
         raise ValueError(f"Column '{column_name}' not found in dataset")
 
-    valid_temps = []
+    valid_values = []
     for row in data:
         val = row.get(column_name)
-        if val is not None and not math.isnan(val):
-            valid_temps.append(val)
+        if val is not None and isinstance(val, (int, float)) and not math.isnan(val):
+            valid_values.append(float(val))
 
-    return valid_temps
+    return valid_values
