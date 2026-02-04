@@ -1,4 +1,4 @@
-from .load_csv_to_df import load_weather_data
+from .data_loader import load_weather_data
 from .data_cleaning import extract_valid_numeric_values
 from .analytics import calculate_mean, calculate_median, calculate_range
 
