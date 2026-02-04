@@ -1,7 +1,7 @@
 import math
 
 # originally did this in main() but got messy so decided it needed its own function
-def extract_valid_temperatures(data, column_name):
+def extract_valid_numeric_values(data, column_name):
     """
     Extracts valid temp values from weather data. Filters out None and NaN values.
     Args:

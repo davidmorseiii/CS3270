@@ -1,5 +1,5 @@
 from .load_csv_to_df import load_weather_data
-from .data_cleaning import extract_valid_temperatures
+from .data_cleaning import extract_valid_numeric_values
 from .analytics import calculate_mean, calculate_median, calculate_range
 
 class WeatherDataset:
@@ -22,7 +22,7 @@ class WeatherDataset:
             Dictionary with mean, median, range, or None if no valid data.
         """
         # reuse existing cleaning function
-        valid_values = extract_valid_temperatures(self._data, column_name)
+        valid_values = extract_valid_numeric_values(self._data, column_name)
 
         if not valid_values:
             return None

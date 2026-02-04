@@ -1,4 +1,4 @@
-import weather_analysis as wa
+from weather_analysis import WeatherDataset
 
 def main():
     file_name = "AustraliaWeatherData/Weather Test Data.csv"
@@ -6,7 +6,7 @@ def main():
 
     try:
         # 1. Create the WeatherDataset object to handle loading its own data
-        dataset = wa.WeatherDataset(file_name)
+        dataset = WeatherDataset(file_name)
         print(f"Total rows: {dataset.get_row_count()}")
 
         # 2. Analyze MaxTemp
