@@ -4,14 +4,20 @@ A semester long weather app project for CS 3270.
 ---
 ## Description
 
-### Phase 3: OOP
-#### Fetches weather data from CSV, cleans it, and calculates descriptive statistics using an object oriented approach.
+### Module 4: Generators and Iterators
+#### Fetches weather data from CSV, processes it using generators/iterators for memory efficiency, and calculates descriptive statistics with comprehensive error handling and logging.
 
 * New features incorporated:
-  * Object-Oriented Programming: Implemented a `WeatherDataset` class to encapsulate weather data and related operations.
-  * Encapsulation: The class manages its own data loading and provides methods (`get_column_statistics`) to access results and hide implementation details.
+  * Generators & Iterators: Implemented memory efficient data processing with `csv_row_generator()`, `valid_numeric_values_generator()`, and `iter_rows()` methods that process data on demand.
+  * Robust Error Handling: Added comprehensive exception handling throughout with specific error types (FileNotFoundError, PermissionError, ValueError, TypeError, csv.Error).
+  * File Handling: Created `open_csv_file()` context manager to ensure proper file opening and closing even when errors occur.
+  * Logging System: Implemented centralized logging configuration with rotating file handlers (10MB max, 5 backups) that log to both console and individual module log files.
+  * Lazy Loading: Added `lazy_load` option parameter to `WeatherDataset` class for on demand data loading.
+  * Streaming Statistics: Added `calculate_statistics_streaming()` for single pass statistics calculation on large datasets
 * How they meet phase expectations:
-  * OOP Implementation: The project now uses a class based approach where the data and statistics calculations are combined into a single entity.
+  * Generators/Iterators: Data is processed incrementally using generators, reducing memory for large CSV files.
+  * Error Handling: Every module now includes try except blocks with specific exception types and graceful degradation.
+  * Logging: All operations are logged to both console and rotating log files in the `logs/` directory.
 ---
 ## Project Setup
 - IDE: PyCharm Professional
