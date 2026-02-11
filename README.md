@@ -4,20 +4,15 @@ A semester long weather app project for CS 3270.
 ---
 ## Description
 
-### Module 4: Generators and Iterators
-#### Fetches weather data from CSV, processes it using generators/iterators for memory efficiency, and calculates descriptive statistics with comprehensive error handling and logging.
+### Module 5: Unit Testing
+#### Added comprehensive unit tests to verify functionality of entire codebase.
 
 * New features incorporated:
-  * Generators & Iterators: Implemented memory efficient data processing with `csv_row_generator()`, `valid_numeric_values_generator()`, and `iter_rows()` methods that process data on demand.
-  * Robust Error Handling: Added comprehensive exception handling throughout with specific error types (FileNotFoundError, PermissionError, ValueError, TypeError, csv.Error).
-  * File Handling: Created `open_csv_file()` context manager to ensure proper file opening and closing even when errors occur.
-  * Logging System: Implemented centralized logging configuration with rotating file handlers (10MB max, 5 backups) that log to both console and individual module log files.
-  * Lazy Loading: Added `lazy_load` option parameter to `WeatherDataset` class for on demand data loading.
-  * Streaming Statistics: Added `calculate_statistics_streaming()` for single pass statistics calculation on large datasets
+  * Unit Tests: Implemented a full set of tests covering all classes and methods.
+  * Test Coverage: Verified logic for taking in csv data, generator processing, and statistical analysis.
 * How they meet phase expectations:
-  * Generators/Iterators: Data is processed incrementally using generators, reducing memory for large CSV files.
-  * Error Handling: Every module now includes try except blocks with specific exception types and graceful degradation.
-  * Logging: All operations are logged to both console and rotating log files in the `logs/` directory.
+  * Code Quality: Ensured reliability through testing of success and failure scenarios.
+  * Regression Testing: Established good baseline to prevent future changes from breaking existing functionality.
 ---
 ## Project Setup
 - IDE: PyCharm Professional
