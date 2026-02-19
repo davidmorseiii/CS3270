@@ -15,5 +15,7 @@ setup(
     python_requires='>=3.8',
     install_requires=[
         'pandas',
+        'matplotlib',
+        'seaborn',
     ],
 )

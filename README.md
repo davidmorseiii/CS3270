@@ -4,34 +4,36 @@ A semester long weather app project for CS 3270.
 ---
 ## Description
 
-### Module 5: Unit Testing
-#### Added comprehensive unit tests to verify functionality of entire codebase.
+### Module 6: Data Patterns, Trends, Visualize
+#### Analyzed weather data to identify patterns and trends with visualization using charts and graphs.
 
 * New features incorporated:
-  * Unit Tests: Implemented a full set of tests covering all classes and methods.
-  * Test Coverage: Verified logic for taking in csv data, generator processing, and statistical analysis.
+  * **Functional Programming**: Used map, filter, lambda expressions, and reduce throughout the visualization module for data processing and analysis.
+  * **Data Filtering**: Created functions to filter weather data for specific conditions (rainfall thresholds, high temperatures, windy days, locations) using filter() and lambda expressions.
+  * **Data Transformation**: Implemented map() with lambda to extract derived metrics (temperature ranges, humidity changes, pressure changes).
+  * **Data Aggregation**: Used reduce() with lambda to calculate totals and find extremes (total rainfall, max/min temps).
+  * **Pattern Analysis**: Identified weather patterns including rain trends, temperature extremes, and correlations between variables.
+  * **Visualizations Created**:
+    * Temperature Distribution: Histogram showing frequency distribution of maximum temperatures across the dataset.
+    * Rainfall Patterns: Histogram of rainfall amounts on rainy days to understand precipitation intensity.
+    * Temperature vs Humidity: Scatter plot revealing relationship between temp and humidity levels.
+    * Wind Speed Distribution: Histogram showing the distribution of wind gust speeds.
+    * Pressure vs Rain: Box plot comparing atmospheric pressure on rainy vs non rainy days to identify weather patterns.
+    * Temperature Range Trends: Histogram of daily temp ranges (MaxTemp - MinTemp) to understand temp variability.
 * How they meet phase expectations:
-  * Code Quality: Ensured reliability through testing of success and failure scenarios.
-  * Regression Testing: Established good baseline to prevent future changes from breaking existing functionality.
+  * **Map**: Used extensively to transform data (extract values, calculate derived metrics like temperature ranges).
+  * **Filter**: Applied throughout to select data subsets (high temps, heavy rain, windy conditions) using lambda predicates.
+  * **Lambda**: Integrated in all filtering and mapping operations for concise, functional data processing.
+  * **Reduce**: Implemented for aggregations (sum rainfall, find max/min temps) with lambda functions.
+  * **Visualization Libraries**: Used matplotlib for plotting, demonstrating data patterns through 6 different chart types.
+  * **Pattern Discovery**: Identified meaningful weather patterns (rain probability, temperature extremes, pressure rain correlation).
 
 #### Automated Tests List
-* **Analytics**
-  * `TestCalculateMean`: `test_mean_basic`, `test_mean_negative_values`, `test_mean_mixed_values`, `test_mean_empty_list`, `test_mean_with_iterator`
-  * `TestCalculateMedian`: `test_median_odd_length`, `test_median_even_length`, `test_median_unsorted`, `test_median_empty_list`, `test_median_with_iterator`
-  * `TestCalculateRange`: `test_range_basic`, `test_range_negative_values`, `test_range_mixed_values`, `test_range_empty_list`
-  * `TestCalculateStatisticsStreaming`: `test_streaming_basic`, `test_streaming_empty_iterator`
+* **Visualization Module**
+  * `TestFilterFunctions`: `test_filter_rainfall_threshold`, `test_filter_high_temperature`, `test_filter_windy_days`, `test_filter_by_location`
+  * `TestTransformFunctions`: `test_extract_temperature_range`, `test_extract_humidity_change`, `test_extract_pressure_change`
+  * `TestAggregateFunctions`: `test_calculate_total_rainfall`, `test_find_max_temperature`, `test_find_min_temperature`
 
-* **Data Cleaning**
-  * `TestValidNumericValuesGenerator`: `test_generator_basic`, `test_generator_filters_none`, `test_generator_filters_nan`, `test_generator_empty_data`, `test_generator_missing_column`
-  * `TestExtractValidNumericValues`: `test_extract_basic`, `test_extract_with_invalid_values`
-  * `TestFilterRowsByCondition`: `test_filter_basic`, `test_filter_none_match`, `test_filter_all_match`, `test_filter_non_callable`
-
-* **Data Loading**
-  * `TestCSVRowGenerator`: `test_csv_generator_basic`, `test_csv_generator_missing_file`, `test_csv_generator_empty_file`
-  * `TestLoadWeatherData`: `test_load_basic`, `test_load_missing_file`
-
-* **WeatherDataset**
-  * `TestWeatherDataset`: `test_init_eager_loading`, `test_init_lazy_loading`, `test_get_row_count`, `test_get_column_statistics`, `test_get_column_statistics_with_none`, `test_get_data`, `test_iter_rows`, `test_missing_file`, `test_lazy_loading_triggers_on_access`
 ---
 ## Project Setup
 - IDE: PyCharm Professional

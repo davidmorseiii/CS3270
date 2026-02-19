@@ -7,6 +7,7 @@ Run pytest with doctests (4 doctests: basic calculate_mean, calculate_median (ev
 - pytest test_weather_analysis.py --doctest-modules -v
 """
 
+# To do: implement tests for Moudle 6 analytics
 import pytest
 import tempfile
 import os
@@ -20,7 +21,19 @@ from weather_analysis import (
     filter_rows_by_condition,
     load_weather_data,
     csv_row_generator,
-    WeatherDataset
+    WeatherDataset,
+    filter_by_rainfall_threshold,
+    filter_high_temperature_days,
+    filter_windy_days,
+    filter_by_location,
+    extract_temperature_range,
+    extract_humidity_change,
+    extract_pressure_change,
+    calculate_total_rainfall,
+    find_max_temperature,
+    find_min_temperature,
+    count_rainy_days,
+    analyze_rain_patterns
 )
 
 # -- Analytics --
@@ -388,6 +401,112 @@ class TestWeatherDataset:
         count = dataset.get_row_count()
         assert dataset._data is not None
         assert count == 3
+
+
+# -- Visualization Module Tests --
+
+class TestFilterFunctions:
+    """Test filter functions"""
+
+    @pytest.fixture
+    def sample_weather_data(self):
+        """Sample data for testing"""
+        return [
+            {'Location': 'Sydney', 'MaxTemp': 30.0, 'MinTemp': 20.0, 'Rainfall': 5.5, 'WindGustSpeed': 45.0, 'RainToday': 'Yes'},
+            {'Location': 'Melbourne', 'MaxTemp': 36.0, 'MinTemp': 22.0, 'Rainfall': 12.0, 'WindGustSpeed': 65.0, 'RainToday': 'No'},
+            {'Location': 'Sydney', 'MaxTemp': 25.0, 'MinTemp': 18.0, 'Rainfall': 0.0, 'WindGustSpeed': 30.0, 'RainToday': 'No'},
+            {'Location': 'Brisbane', 'MaxTemp': 38.0, 'MinTemp': 25.0, 'Rainfall': 15.5, 'WindGustSpeed': 70.0, 'RainToday': 'Yes'},
+        ]
+
+    def test_filter_rainfall_threshold(self, sample_weather_data):
+        """Test filtering by rainfall threshold"""
+        result = filter_by_rainfall_threshold(sample_weather_data, 10.0)
+        assert len(result) == 2
+        assert all(row['Rainfall'] >= 10.0 for row in result)
+
+    def test_filter_high_temperature(self, sample_weather_data):
+        """Test filtering by high temp"""
+        result = filter_high_temperature_days(sample_weather_data, 35.0)
+        assert len(result) == 2
+        assert all(row['MaxTemp'] >= 35.0 for row in result)
+
+    def test_filter_windy_days(self, sample_weather_data):
+        """Test filtering by wind speed"""
+        result = filter_windy_days(sample_weather_data, 60.0)
+        assert len(result) == 2
+        assert all(row['WindGustSpeed'] >= 60.0 for row in result)
+
+    def test_filter_by_location(self, sample_weather_data):
+        """Test filtering by location"""
+        result = filter_by_location(sample_weather_data, 'Sydney')
+        assert len(result) == 2
+        assert all(row['Location'] == 'Sydney' for row in result)
+
+
+class TestTransformFunctions:
+    """Test transformation functions"""
+
+    @pytest.fixture
+    def sample_weather_data(self):
+        """Sample weather data for testing"""
+        return [
+            {'MaxTemp': 30.0, 'MinTemp': 20.0, 'Humidity9am': 70, 'Humidity3pm': 60, 'Pressure9am': 1015.0, 'Pressure3pm': 1013.0},
+            {'MaxTemp': 35.0, 'MinTemp': 22.0, 'Humidity9am': 65, 'Humidity3pm': 50, 'Pressure9am': 1018.0, 'Pressure3pm': 1016.0},
+            {'MaxTemp': 25.0, 'MinTemp': 18.0, 'Humidity9am': 80, 'Humidity3pm': 70, 'Pressure9am': 1012.0, 'Pressure3pm': 1010.0},
+        ]
+
+    def test_extract_temperature_range(self, sample_weather_data):
+        """Test temperature range extraction"""
+        result = extract_temperature_range(sample_weather_data)
+        assert len(result) == 3
+        assert result[0] == 10.0
+        assert result[1] == 13.0
+        assert result[2] == 7.0
+
+    def test_extract_humidity_change(self, sample_weather_data):
+        """Test humidity change extraction"""
+        result = extract_humidity_change(sample_weather_data)
+        assert len(result) == 3
+        assert result[0] == -10
+        assert result[1] == -15
+        assert result[2] == -10
+
+    def test_extract_pressure_change(self, sample_weather_data):
+        """Test pressure change extraction"""
+        result = extract_pressure_change(sample_weather_data)
+        assert len(result) == 3
+        assert result[0] == -2.0
+        assert result[1] == -2.0
+        assert result[2] == -2.0
+
+
+class TestAggregateFunctions:
+    """Test aggregation functions"""
+
+    @pytest.fixture
+    def sample_weather_data(self):
+        """Sample data for testing"""
+        return [
+            {'MaxTemp': 30.0, 'MinTemp': 15.0, 'Rainfall': 5.5},
+            {'MaxTemp': 35.0, 'MinTemp': 10.0, 'Rainfall': 12.0},
+            {'MaxTemp': 25.0, 'MinTemp': 20.0, 'Rainfall': 0.0},
+            {'MaxTemp': 40.0, 'MinTemp': 8.0, 'Rainfall': 3.5},
+        ]
+
+    def test_calculate_total_rainfall(self, sample_weather_data):
+        """Test total rainfall calculation using reduce"""
+        result = calculate_total_rainfall(sample_weather_data)
+        assert result == 21.0
+
+    def test_find_max_temperature(self, sample_weather_data):
+        """Test finding max temp using reduce"""
+        result = find_max_temperature(sample_weather_data)
+        assert result == 40.0
+
+    def test_find_min_temperature(self, sample_weather_data):
+        """Test finding min temp using reduce"""
+        result = find_min_temperature(sample_weather_data)
+        assert result == 8.0
 
 
 if __name__ == '__main__':
