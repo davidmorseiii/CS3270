@@ -1,5 +1,6 @@
 import csv
 import os
+import asyncio
 from contextlib import contextmanager
 from .logger_config import setup_logger
 
@@ -129,4 +130,54 @@ def load_weather_data(file_path):
         return data
     except Exception as e:
         logger.error(f"Failed to load weather data from {file_path}: {e}")
+        raise
+
+
+async def load_weather_data_async(file_path):
+    """
+    Asynchronously load weather data from CSV
+    Uses asyncio to perform IO bound file reading wihtout blocking
+    Args:
+        file_path: Path to CSV file
+    Returns:
+        List of dicts containing weather data
+    Raises:
+        FileNotFoundError: File doesn't exist
+        ValueError: CSV file is empty or messed up
+        Exception: Other CSV reading errors
+    """
+    try:
+        logger.info(f"Async loading weather data from: {file_path}")
+        # run the blocking CSV read operation in thread pool executor
+        loop = asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, load_weather_data, file_path)
+        logger.info(f"Async loaded {len(data)} records successfully")
+        return data
+    except Exception as e:
+        logger.error(f"Failed to async load weather data from {file_path}: {e}")
+        raise
+
+
+async def load_weather_data_async(file_path):
+    """
+    Asynchronously load weather data from CSV
+    Uses asyncio to perform IO bound file reading without blocking
+    Args:
+        file_path: Path to CSV file
+    Returns:
+        List of dicts containing weather data
+    Raises:
+        FileNotFoundError: File doesn't exist
+        ValueError: CSV file is empty or messed up
+        Exception: Other CSV reading errors
+    """
+    try:
+        logger.info(f"Async loading weather data from: {file_path}")
+        # run the blocking CSV read operation in a thread pool executor
+        loop = asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, load_weather_data, file_path)
+        logger.info(f"Async loaded {len(data)} records successfully")
+        return data
+    except Exception as e:
+        logger.error(f"Failed to async load weather data from {file_path}: {e}")
         raise

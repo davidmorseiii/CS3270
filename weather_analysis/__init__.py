@@ -1,4 +1,4 @@
-from .data_loader import load_weather_data, csv_row_generator, open_csv_file
+from .data_loader import load_weather_data, load_weather_data_async, csv_row_generator, open_csv_file
 from .analytics import (
     calculate_mean,
     calculate_median,
@@ -30,11 +30,13 @@ from .visualization import (
     plot_temperature_vs_humidity,
     plot_wind_speed_distribution,
     plot_pressure_vs_rain,
-    plot_temperature_range_trends
+    plot_temperature_range_trends,
+    generate_all_plots_parallel
 )
 
 __all__ = [
     'load_weather_data',
+    'load_weather_data_async',
     'csv_row_generator',
     'open_csv_file',
     'calculate_mean',
@@ -64,4 +66,5 @@ __all__ = [
     'plot_wind_speed_distribution',
     'plot_pressure_vs_rain',
     'plot_temperature_range_trends',
+    'generate_all_plots_parallel',
 ]

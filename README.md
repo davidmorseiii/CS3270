@@ -4,29 +4,27 @@ A semester long weather app project for CS 3270.
 ---
 ## Description
 
-### Module 6: Data Patterns, Trends, Visualize
-#### Analyzed weather data to identify patterns and trends with visualization using charts and graphs.
+### Module 7: Multithreading Concurrency
+#### Implemented asynchronous data fetching and multiprocessing for improved performance and efficiency.
 
 * New features incorporated:
-  * **Functional Programming**: Used map, filter, lambda expressions, and reduce throughout the visualization module for data processing and analysis.
-  * **Data Filtering**: Created functions to filter weather data for specific conditions (rainfall thresholds, high temperatures, windy days, locations) using filter() and lambda expressions.
-  * **Data Transformation**: Implemented map() with lambda to extract derived metrics (temperature ranges, humidity changes, pressure changes).
-  * **Data Aggregation**: Used reduce() with lambda to calculate totals and find extremes (total rainfall, max/min temps).
-  * **Pattern Analysis**: Identified weather patterns including rain trends, temperature extremes, and correlations between variables.
-  * **Visualizations Created**:
-    * Temperature Distribution: Histogram showing frequency distribution of maximum temperatures across the dataset.
-    * Rainfall Patterns: Histogram of rainfall amounts on rainy days to understand precipitation intensity.
-    * Temperature vs Humidity: Scatter plot revealing relationship between temp and humidity levels.
-    * Wind Speed Distribution: Histogram showing the distribution of wind gust speeds.
-    * Pressure vs Rain: Box plot comparing atmospheric pressure on rainy vs non rainy days to identify weather patterns.
-    * Temperature Range Trends: Histogram of daily temp ranges (MaxTemp - MinTemp) to understand temp variability.
-* How they meet phase expectations:
-  * **Map**: Used extensively to transform data (extract values, calculate derived metrics like temperature ranges).
-  * **Filter**: Applied throughout to select data subsets (high temps, heavy rain, windy conditions) using lambda predicates.
-  * **Lambda**: Integrated in all filtering and mapping operations for concise, functional data processing.
-  * **Reduce**: Implemented for aggregations (sum rainfall, find max/min temps) with lambda functions.
-  * **Visualization Libraries**: Used matplotlib for plotting, demonstrating data patterns through 6 different chart types.
-  * **Pattern Discovery**: Identified meaningful weather patterns (rain probability, temperature extremes, pressure rain correlation).
+  * **Asynchronous Data Loading**: Implemented `load_weather_data_async()` in `data_loader.py` using Python's `asyncio` library to perform non blocking I/O operations when loading CSV files. This prevents the application from blocking on I/O bound tasks.
+  * **Multiprocessing for Visualizations**: Added `generate_all_plots_parallel()` in `visualization.py` that uses Python's `multiprocessing.Pool` to generate all six visualization plots concurrently across multiple CPU cores. This significantly reduces the time required for intensive matplotlib rendering.
+  * **Async Main Function**: Refactored `main.py` to use `async def async_main()` and `asyncio.run()` to support asynchronous execution flow.
+  * **Non-Interactive Backend**: Configured matplotlib to use the 'Agg' backend for thread safe, non interactive plot generation suitable for multiprocessing.
+
+* Where and why these features are used:
+  * **Asyncio (data_loader.py)**: Used `asyncio` with `run_in_executor()` to offload file I/O operations to a thread pool, allowing event loop to remain responsive. This is ideal for I/O-bound tasks like reading large CSV files.
+  * **Multiprocessing (visualization.py)**: Used `multiprocessing.Pool` to distribute the generation of 6 different visualization plots across multiple CPU cores. Each plot generation involves compute intensive operations (data filtering, statistical calculations, and matplotlib rendering), making it ideal for parallelism to utilize multi core CPUs.
+  * **Why Async for I/O**: File reading is I/O-bound, meaning the CPU spends time waiting for disk operations. Async I/O allows other operations to go while waiting, improving overall application responsiveness.
+  * **Why Multiprocessing for Plots**: Generating matplotlib visualizations is CPU intensive (data processing, rendering graphics). Multiprocessing bypasses Python's GIL to achieve true parallelism on multi core systems, which significantly reduces total execution time.
+
+* Performance benefits:
+  * Visualization generation time reduced by utilizing multiple CPU cores simultaneously
+  * Same results as sequential version, only faster
+  * Better resource utilization on multi-core systems
+
+---
 
 #### Automated Tests List
 * **Visualization Module**

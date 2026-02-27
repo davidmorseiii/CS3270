@@ -1,4 +1,5 @@
 import sys
+import asyncio
 from weather_analysis import (
     WeatherDataset,
     filter_by_rainfall_threshold,
@@ -10,23 +11,18 @@ from weather_analysis import (
     count_rainy_days,
     analyze_rain_patterns,
     extract_temperature_range,
-    plot_temperature_distribution,
-    plot_rainfall_patterns,
-    plot_temperature_vs_humidity,
-    plot_wind_speed_distribution,
-    plot_pressure_vs_rain,
-    plot_temperature_range_trends
+    generate_all_plots_parallel
 )
 from weather_analysis.logger_config import setup_logger
 
 logger = setup_logger('main')
 
-def main():
-    """Run weather analysis with data visualization"""
+async def async_main():
+    """Run weather analysis with async data loading and parallel visualization"""
     file_name = "AustraliaWeatherData/Weather Training Data.csv"
 
     try:
-        logger.info("Starting weather analysis application")
+        logger.info("Starting weather analysis application with async/parallel processing")
 
         # Create WeatherDataset object to handle loading its own data
         logger.info(f"Loading dataset from: {file_name}")
@@ -100,31 +96,22 @@ def main():
             print(f"Largest daily range:  {max_range:.2f}°C")
             print(f"Smallest daily range: {min_range:.2f}°C")
 
-        # Data Visualization
+        # Data Visualization using parallel processing
         print("\n" + "=" * 60)
-        print("GENERATING VISUALIZATIONS")
+        print("GENERATING VISUALIZATIONS (Parallel Processing)")
         print("=" * 60)
 
-        print("\nCreating charts...")
+        print("\nCreating charts in parallel using multiprocessing...")
 
-        # Generate visualizations
-        plot_temperature_distribution(data, 'temperature_distribution.png')
-        print("✓ Temperature distirbution histogram saved")
+        # Generate all visualizations in parallel using multiprocessing
+        results = generate_all_plots_parallel(data)
 
-        plot_rainfall_patterns(data, 'rainfall_patterns.png')
-        print("✓ Rainfall patterns histogram saved")
-
-        plot_temperature_vs_humidity(data, 'temp_vs_humidity.png')
-        print("✓ Temperature vs Humidity scatter plot saved")
-
-        plot_wind_speed_distribution(data, 'wind_speed_distribution.png')
-        print("✓ Wind speed distribution histogram saved")
-
-        plot_pressure_vs_rain(data, 'pressure_vs_rain.png')
-        print("✓ Pressure vs Rain comparison box plot saved")
-
-        plot_temperature_range_trends(data, 'temperature_range_trends.png')
-        print("✓ Temperature range trends histogram saved")
+        # Display results
+        for output_path, success in results:
+            if success:
+                print(f"✓ {output_path} saved")
+            else:
+                print(f"✗ Failed to create {output_path}")
 
         print("\n" + "=" * 60)
         print("ANAYLSIS COMPLETE")
@@ -157,6 +144,11 @@ def main():
         logger.critical(f"Unexpected error: {e}", exc_info=True)
         print(f"Unexpected error: {e}")
         sys.exit(1)
+
+
+def main():
+    """Entry point that run the async main function"""
+    asyncio.run(async_main())
 
 
 if __name__ == '__main__':

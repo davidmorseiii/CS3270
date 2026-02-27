@@ -1,5 +1,8 @@
 from functools import reduce
 from typing import Iterable, Callable, List, Dict, Tuple
+from multiprocessing import Pool
+import matplotlib
+matplotlib.use('Agg')  # use non interactive backend for multiprocessing
 import matplotlib.pyplot as plt
 from .logger_config import setup_logger
 
@@ -470,3 +473,51 @@ def plot_temperature_range_trends(data: Iterable[dict], output_path: str = 'temp
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
     logger.info(f"Temperature range trends plot saved to {output_path}")
+
+
+# -- Parallel Visualization --
+
+def _plot_wrapper(args):
+    """
+    Wrapper funtcion for parallel visualization generation
+    Args:
+        args: Tuple of (plot_function, data, output_path)
+    Returns:
+        Tuple of (output_path, success_boolean)
+    """
+    plot_func, data, output_path = args
+    try:
+        plot_func(data, output_path)
+        return (output_path, True)
+    except Exception as e:
+        logger.error(f"Error generating plot {output_path}: {e}")
+        return (output_path, False)
+
+
+def generate_all_plots_parallel(data: List[dict], num_processes: int = None):
+    """
+    Generate all visualizations in parallel with multiprocessing
+    Args:
+        data: List of weather data dicts
+        num_processes: Number of processes to use (defaults to CPU count)
+    Returns:
+        List of tuples (output_path, success)
+    """
+    logger.info("Generating all plots in parallel using multiprocessing")
+
+    # Define all plots to generate
+    plot_tasks = [
+        (plot_temperature_distribution, data, 'temperature_distribution.png'),
+        (plot_rainfall_patterns, data, 'rainfall_patterns.png'),
+        (plot_temperature_vs_humidity, data, 'temp_vs_humidity.png'),
+        (plot_wind_speed_distribution, data, 'wind_speed_distribution.png'),
+        (plot_pressure_vs_rain, data, 'pressure_vs_rain.png'),
+        (plot_temperature_range_trends, data, 'temperature_range_trends.png'),
+    ]
+
+    # Use multiprocessing to generate plots in parallel
+    with Pool(processes=num_processes) as pool:
+        results = pool.map(_plot_wrapper, plot_tasks)
+
+    logger.info(f"Completed parallel plot generation: {len([r for r in results if r[1]])} successful")
+    return results
