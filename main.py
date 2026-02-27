@@ -29,7 +29,7 @@ async def async_main():
         dataset = WeatherDataset(file_name)
 
         print("=" * 60)
-        print("WEATHER DATA ANALYSIS - Module 6")
+        print("WEATHER DATA ANALYSIS")
         print("Data Patterns, Trends, and Visualization")
         print("=" * 60)
 
