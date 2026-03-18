@@ -33,6 +33,14 @@ from .visualization import (
     plot_temperature_range_trends,
     generate_all_plots_parallel
 )
+from .spark_analysis import (
+    total_rainfall_df,
+    max_temperature_df,
+    min_temperature_df,
+    count_rainy_days_df,
+    analyze_rain_patterns_df,
+    temperature_range_stats_df,
+)
 
 __all__ = [
     'load_weather_data',
@@ -67,4 +75,10 @@ __all__ = [
     'plot_pressure_vs_rain',
     'plot_temperature_range_trends',
     'generate_all_plots_parallel',
+    'total_rainfall_df',
+    'max_temperature_df',
+    'min_temperature_df',
+    'count_rainy_days_df',
+    'analyze_rain_patterns_df',
+    'temperature_range_stats_df',
 ]
