@@ -1,31 +1,37 @@
 # Weather App
 A semester long weather app project for CS 3270.
 
----
 ## Description
 
-### Module 7: Multithreading Concurrency
-#### Implemented asynchronous data fetching and multiprocessing for improved performance and efficiency.
+### Module 9: 3 Tier Flask Web Application
+#### Developed a browser based 3 tier web application using Flask, Jinja2, SQLite, and SQLAlchemy.
 
-* New features incorporated:
-  * **Asynchronous Data Loading**: Implemented `load_weather_data_async()` in `data_loader.py` using Python's `asyncio` library to perform non blocking I/O operations when loading CSV files. This prevents the application from blocking on I/O bound tasks.
-  * **Multiprocessing for Visualizations**: Added `generate_all_plots_parallel()` in `visualization.py` that uses Python's `multiprocessing.Pool` to generate all six visualization plots concurrently across multiple CPU cores. This significantly reduces the time required for intensive matplotlib rendering.
-  * **Async Main Function**: Refactored `main.py` to use `async def async_main()` and `asyncio.run()` to support asynchronous execution flow.
-  * **Non-Interactive Backend**: Configured matplotlib to use the 'Agg' backend for thread safe, non interactive plot generation suitable for multiprocessing.
+* **Three tier architecture:**
+  * **UI**: Browser based HTML/CSS interface with Jinja2 templates. User can filter records, browse locations, view the visualizations, and see query history.
+  * **Business Logic**: Flask routes and Python functions in `app.py` handle request processing, apply filters using my existing analysis modules and compute statistics on demand.
+  * **Data Access**: SQLite database via SQLAlchemy (`models.py`) stores two types of application data:
+    * **`QueryLog`** — analysis querys submitted through the UI.
+    * **`LocationStats`** — per location stats computed once and cached so not recomputed on every request.
 
-* Where and why these features are used:
-  * **Asyncio (data_loader.py)**: Used `asyncio` with `run_in_executor()` to offload file I/O operations to a thread pool, allowing event loop to remain responsive. This is ideal for I/O-bound tasks like reading large CSV files.
-  * **Multiprocessing (visualization.py)**: Used `multiprocessing.Pool` to distribute the generation of 6 different visualization plots across multiple CPU cores. Each plot generation involves compute intensive operations (data filtering, statistical calculations, and matplotlib rendering), making it ideal for parallelism to utilize multi core CPUs.
-  * **Why Async for I/O**: File reading is I/O-bound, meaning the CPU spends time waiting for disk operations. Async I/O allows other operations to go while waiting, improving overall application responsiveness.
-  * **Why Multiprocessing for Plots**: Generating matplotlib visualizations is CPU intensive (data processing, rendering graphics). Multiprocessing bypasses Python's GIL to achieve true parallelism on multi core systems, which significantly reduces total execution time.
-
-* Performance benefits:
-  * Visualization generation time reduced by utilizing multiple CPU cores simultaneously
-  * Same results as sequential version, only faster
-  * Better resource utilization on multi-core systems
+* **Pages:**
+  * **Dashboard** (`/`) — Overall dataset statistics, rain pattern summary, and recent query history.
+  * **Analysis** (`/analysis`) — Filter records by location, temp range, rainfall, and rain status. Shows matching statistics and a data table up to 200 rows.
+  * **Locations** (`/locations`) — Table of all 49 locations with cached statistics.
+  * **Location Detail** (`/location/<name>`) — Per location stats and rain patterns.
+  * **Visualizations** (`/visualizations`) — All six matplotlib charts from `static/img/`. "Regenerate" button re runs plot generation.
+  * **History** (`/history`) — Log of all queries stored in SQLite.
 
 ---
+### Module 8: PySpark Distributed Processing
+#### Implemented distributed data analysis with Apache PySpark on a 3 node cluster.
 
+* New features incorporated:
+  * **Distributed Analysis Functions**: Added `spark_analysis.py` with PySpark DataFrame equivilents of the main analysis functions.
+  * **Spark Job Entry Point**: Created `spark_job.py` for submitting work to Spark cluster via `spark-submit`.
+
+* Note: Module 9 does not require Spark and runs on a single machine.
+
+---
 #### Automated Tests List
 * **Visualization Module**
   * `TestFilterFunctions`: `test_filter_rainfall_threshold`, `test_filter_high_temperature`, `test_filter_windy_days`, `test_filter_by_location`
@@ -34,11 +40,9 @@ A semester long weather app project for CS 3270.
 
 ---
 ## Project Setup
-- IDE: PyCharm Professional
-- Environment: Windows 11
+- IDE: VS Code
+- Environment: Ubuntu (I caved, shame on me. I started this project using Pycharm in Windows for the sake of learning something new, but as complexity grew, so did my frustration with Windows)
 - Source Control: GitHub
-- Notes: I have been using Linux with VS Code to program for several years now, and I realized that I'm not nearly as comfortable on Windows as I want to be.
-  I'm choosing to work on Windows and try a new IDE this semester to strengthen my confidence with Windows and learn something new.
 
 ---
 ## Requirements
@@ -50,35 +54,94 @@ A semester long weather app project for CS 3270.
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/davidmorseiii/CS3270.git
-```
-
-### 2. Navigate to the project directory
-```bash
 cd CS3270
 ```
 
-### 3. Create a virtual environment (recommended)
+### 2. Create and activate a virtual environment
 
-#### On MacOS/Linux:
+**macOS / Linux:**
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
-#### On Windows:
+
+**Windows:**
 ```cmd
-python -m venv venv
-venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate
 ```
 
-### 4. Install the package
+### 3. Install dependencies
 ```bash
 pip install .
+pip install flask flask-sqlalchemy
 ```
 
-### 5. Run the program
+### 4. Run the original CLI analysis
 ```bash
 python main.py
 ```
+
+### 5. Run the Flask web application
+
+```bash
+python app.py
+```
+
+Then open: **http://127.0.0.1:5000** in your browser
+
+The app will:
+1. Load all weather records from `Weather Training Data.csv` on first request (takes a few seconds).
+2. Create `weather_app.db` automatically in project root.
+3. Generate the six visualization charts into `static/img/` on first visit to the visualizations page.
+
+---
+## Running the Tests
+```bash
+pytest test_weather_analysis.py -v
+```
+
+Include doctests:
+```bash
+pytest test_weather_analysis.py --doctest-modules -v
+```
+
+---
+## Project Structure
+
+```
+CS3270/
+├── app.py                          # Flask web application (entry point)
+├── models.py                       # SQLAlchemy models (QueryLog, LocationStats)
+├── main.py                         # Original CLI entry
+├── spark_job.py                    # PySpark distributed job
+├── test_weather_analysis.py        # pytest test suite
+├── setup.py                        # Package configuration
+├── weather_app.db                  # SQLite database (created on first run)
+├── weather_analysis/               # Core analysis package
+│   ├── analytics.py                # Statistical functions
+│   ├── data_cleaning.py            # Data validation
+│   ├── data_loader.py              # CSV loading (sync & async)
+│   ├── logger_config.py            # Logging setup
+│   ├── spark_analysis.py           # PySpark functions
+│   ├── visualization.py            # Plotting & filter/map/reduce functions
+│   └── weather_dataset.py          # WeatherDataset class
+├── templates/                      # Jinja2 HTML templates
+│   ├── base.html
+│   ├── index.html                  # Dashboard
+│   ├── analysis.html               # Filter & query page
+│   ├── locations.html              # Location list
+│   ├── location_detail.html        # Per location detail
+│   ├── visualizations.html         # Charts page
+│   └── history.html                # Query history
+├── static/
+│   ├── css/style.css               # Stylesheet
+│   └── img/                        # Generated plot images
+└── AustraliaWeatherData/
+    ├── Weather Training Data.csv   
+    └── Weather Test Data.csv       
+```
+
 ---
 ## Author
 * Name: David Morse

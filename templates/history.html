@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Query History{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Query History</h1>
+  <p class="subtitle">All analysis and location queries stored in the SQLite database.</p>
+</div>
+
+<section class="card">
+  {% if pagination.items %}
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Timestamp</th>
+          <th>Type</th>
+          <th>Location</th>
+          <th>Min Temp</th>
+          <th>Max Temp</th>
+          <th>Min Rainfall</th>
+          <th>Rain Today</th>
+          <th>Results</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for q in pagination.items %}
+        <tr>
+          <td>{{ q.id }}</td>
+          <td>{{ q.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td><span class="badge">{{ q.query_type }}</span></td>
+          <td>
+            {% if q.location %}
+            <a href="{{ url_for('location_detail', name=q.location) }}">{{ q.location }}</a>
+            {% else %}—{% endif %}
+          </td>
+          <td>{% if q.min_temp is not none %}≥ {{ q.min_temp }}°C{% else %}—{% endif %}</td>
+          <td>{% if q.max_temp is not none %}≤ {{ q.max_temp }}°C{% else %}—{% endif %}</td>
+          <td>{% if q.min_rainfall is not none %}≥ {{ q.min_rainfall }} mm{% else %}—{% endif %}</td>
+          <td>
+            {% if q.rain_today %}
+            <span class="badge {% if q.rain_today == 'Yes' %}badge-rain{% else %}badge-dry{% endif %}">
+              {{ q.rain_today }}
+            </span>
+            {% else %}—{% endif %}
+          </td>
+          <td>{{ "{:,}".format(q.result_count) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Page controls-->
+  <div class="pagination">
+    {% if pagination.has_prev %}
+    <a class="page-btn" href="{{ url_for('history', page=pagination.prev_num) }}">&larr; Prev</a>
+    {% endif %}
+    <span class="page-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+    {% if pagination.has_next %}
+    <a class="page-btn" href="{{ url_for('history', page=pagination.next_num) }}">Next &rarr;</a>
+    {% endif %}
+  </div>
+  {% else %}
+  <p class="empty-msg">No queries recorded yet. Try the <a href="{{ url_for('analysis') }}">Analysis</a> page.</p>
+  {% endif %}
+</section>
+{% endblock %}

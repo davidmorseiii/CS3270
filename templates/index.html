@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Australian Weather Dashboard</h1>
+  <p class="subtitle">Exploring {{ "{:,}".format(stats.total) }} records across {{ location_count }} locations</p>
+</div>
+
+<!-- Summary stat cards -->
+<section class="card-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ "{:,}".format(stats.total) }}</div>
+    <div class="stat-label">Total Records</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ location_count }}</div>
+    <div class="stat-label">Locations</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.avg_max_temp }}°C</div>
+    <div class="stat-label">Avg Max Temperature</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.avg_min_temp }}°C</div>
+    <div class="stat-label">Avg Min Temperature</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.rainy_day_pct }}%</div>
+    <div class="stat-label">Rainy Days</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.avg_rainfall }} mm</div>
+    <div class="stat-label">Avg Daily Rainfall</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.max_temp_ever }}°C</div>
+    <div class="stat-label">Record High</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.min_temp_ever }}°C</div>
+    <div class="stat-label">Record Low</div>
+  </div>
+</section>
+
+<!-- Rain pattern summary -->
+<section class="card">
+  <h2>Rain Pattern Summary</h2>
+  <div class="card-grid four-col">
+    <div class="mini-stat">
+      <span class="mini-val">{{ "{:,}".format(rain_patterns.rain_today) }}</span>
+      <span class="mini-lbl">Rained Today</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-val">{{ "{:,}".format(rain_patterns.rain_tomorrow) }}</span>
+      <span class="mini-lbl">Rain Tomorrow</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-val">{{ "{:,}".format(rain_patterns.consecutive_rain) }}</span>
+      <span class="mini-lbl">Consecutive Rain Days</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-val">{{ "{:,}".format(rain_patterns.total_days) }}</span>
+      <span class="mini-lbl">Total Days</span>
+    </div>
+  </div>
+</section>
+
+<!-- Quick access actions-->
+<section class="card">
+  <h2>Explore the Data</h2>
+  <div class="action-grid">
+    <a class="action-btn" href="{{ url_for('analysis') }}">
+      <span>Filter &amp; Analyse</span>
+      <small>Apply temperature, rainfall, and location filters</small>
+    </a>
+    <a class="action-btn" href="{{ url_for('locations') }}">
+      <span>Browse Locations</span>
+      <small>Per location statistics for {{ location_count }} cities</small>
+    </a>
+    <a class="action-btn" href="{{ url_for('visualizations') }}">
+      <span>View Charts</span>
+      <small>Six interactive visualizations</small>
+    </a>
+    <a class="action-btn" href="{{ url_for('history') }}">
+      <span>Query History</span>
+      <small>Review past searches stored in the database</small>
+    </a>
+  </div>
+</section>
+
+<!-- Recent query history -->
+{% if recent_queries %}
+<section class="card">
+  <h2>Recent Queries</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Type</th>
+        <th>Location</th>
+        <th>Filters</th>
+        <th>Results</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for q in recent_queries %}
+      <tr>
+        <td>{{ q.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td><span class="badge">{{ q.query_type }}</span></td>
+        <td>{{ q.location or '—' }}</td>
+        <td class="filter-summary">
+          {% if q.min_temp is not none %}MinTemp ≥ {{ q.min_temp }}°C {% endif %}
+          {% if q.max_temp is not none %}MaxTemp ≤ {{ q.max_temp }}°C {% endif %}
+          {% if q.min_rainfall is not none %}Rain ≥ {{ q.min_rainfall }} mm {% endif %}
+          {% if q.rain_today %}RainToday={{ q.rain_today }} {% endif %}
+          {% if not q.min_temp and not q.max_temp and not q.min_rainfall and not q.rain_today and not q.location %}
+            No filters
+          {% endif %}
+        </td>
+        <td>{{ "{:,}".format(q.result_count) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a class="link-more" href="{{ url_for('history') }}">View full history &rarr;</a>
+</section>
+{% endif %}
+{% endblock %}

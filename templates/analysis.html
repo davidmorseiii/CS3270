@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Weather Analysis</h1>
+  <p class="subtitle">Filter records and compute statistics on the result set.</p>
+</div>
+
+<section class="card">
+  <h2>Filter Options</h2>
+  <form method="POST" action="{{ url_for('analysis') }}" class="filter-form">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="location">Location</label>
+        <select name="location" id="location">
+          <option value="">All locations</option>
+          {% for loc in locations %}
+          <option value="{{ loc }}" {% if form_values.get('location') == loc %}selected{% endif %}>{{ loc }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="rain_today">Rain Today</label>
+        <select name="rain_today" id="rain_today">
+          <option value="">Any</option>
+          <option value="Yes" {% if form_values.get('rain_today') == 'Yes' %}selected{% endif %}>Yes</option>
+          <option value="No"  {% if form_values.get('rain_today') == 'No'  %}selected{% endif %}>No</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="min_temp">Min Max-Temperature (°C)</label>
+        <input type="number" step="0.1" name="min_temp" id="min_temp"
+               placeholder="e.g. 30" value="{{ form_values.get('min_temp', '') }}" />
+      </div>
+      <div class="form-group">
+        <label for="max_temp">Max Max-Temperature (°C)</label>
+        <input type="number" step="0.1" name="max_temp" id="max_temp"
+               placeholder="e.g. 45" value="{{ form_values.get('max_temp', '') }}" />
+      </div>
+      <div class="form-group">
+        <label for="min_rainfall">Min Rainfall (mm)</label>
+        <input type="number" step="0.1" name="min_rainfall" id="min_rainfall"
+               placeholder="e.g. 5" value="{{ form_values.get('min_rainfall', '') }}" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Apply Filters</button>
+      <a href="{{ url_for('analysis') }}" class="btn-secondary">Reset</a>
+    </div>
+  </form>
+</section>
+
+<!-- Results section only shown after a POST -->
+{% if results is not none %}
+<section class="card">
+  <h2>Results</h2>
+
+  {% if result_stats %}
+  <div class="card-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ "{:,}".format(result_stats.total) }}</div>
+      <div class="stat-label">Matching Records</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ result_stats.avg_max_temp }}°C</div>
+      <div class="stat-label">Avg Max Temp</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ result_stats.avg_min_temp }}°C</div>
+      <div class="stat-label">Avg Min Temp</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ result_stats.rainy_day_pct }}%</div>
+      <div class="stat-label">Rainy Days</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ result_stats.avg_rainfall }} mm</div>
+      <div class="stat-label">Avg Rainfall</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ result_stats.max_temp_ever }}°C</div>
+      <div class="stat-label">Record High</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if results %}
+  <p class="table-note">Showing up to 200 rows. Apply tighter filters to narrow results.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>Min Temp</th>
+          <th>Max Temp</th>
+          <th>Rainfall</th>
+          <th>Wind Gust</th>
+          <th>Humidity 3pm</th>
+          <th>Pressure 9am</th>
+          <th>Rain Today</th>
+          <th>Rain Tomorrow</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr>
+          <td>
+            <a href="{{ url_for('location_detail', name=row.Location) }}">{{ row.Location }}</a>
+          </td>
+          <td>{{ row.MinTemp if row.MinTemp is not none else '—' }}</td>
+          <td>{{ row.MaxTemp if row.MaxTemp is not none else '—' }}</td>
+          <td>{{ row.Rainfall if row.Rainfall is not none else '—' }}</td>
+          <td>{{ row.WindGustSpeed if row.WindGustSpeed is not none else '—' }}</td>
+          <td>{{ row.Humidity3pm if row.Humidity3pm is not none else '—' }}</td>
+          <td>{{ row.Pressure9am if row.Pressure9am is not none else '—' }}</td>
+          <td>
+            <span class="badge {% if row.RainToday == 'Yes' %}badge-rain{% else %}badge-dry{% endif %}">
+              {{ row.RainToday or '—' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if row.RainTomorrow == 'Yes' %}badge-rain{% else %}badge-dry{% endif %}">
+              {{ row.RainTomorrow or '—' }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="empty-msg">No records match selected filters.</p>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

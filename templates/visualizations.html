@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Visualizations{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Visualizations</h1>
+  <p class="subtitle">Six charts generated from the Australian weather dataset.</p>
+</div>
+
+<section class="card">
+  <form method="POST" action="{{ url_for('generate_visualizations') }}" style="display:inline;">
+    <button type="submit" class="btn-primary">Regenerate All Charts</button>
+  </form>
+  <p class="table-note" style="margin-top: 0.5rem;">
+    Charts are generated using multiprocessing and saved to <code>static/img/</code>.
+  </p>
+</section>
+
+<div class="plot-grid">
+  {% for filename, title, description in plots %}
+  <div class="plot-card">
+    <h3>{{ title }}</h3>
+    <p class="plot-desc">{{ description }}</p>
+    <img src="{{ url_for('static', filename='img/' + filename) }}?v={{ range(1,9999) | random }}"
+         alt="{{ title }}"
+         class="plot-img"
+         loading="lazy" />
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

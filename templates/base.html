@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Weather Analysis{% endblock %} — CS3270</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="brand" href="{{ url_for('index') }}">Weather Analysis</a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>Dashboard</a></li>
+      <li><a href="{{ url_for('analysis') }}" {% if request.endpoint == 'analysis' %}class="active"{% endif %}>Analysis</a></li>
+      <li><a href="{{ url_for('locations') }}" {% if request.endpoint in ('locations','location_detail') %}class="active"{% endif %}>Locations</a></li>
+      <li><a href="{{ url_for('visualizations') }}" {% if request.endpoint == 'visualizations' %}class="active"{% endif %}>Visualizations</a></li>
+      <li><a href="{{ url_for('history') }}" {% if request.endpoint == 'history' %}class="active"{% endif %}>History</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>CS3270 &mdash; Australian Weather Data &mdash; David Morse</p>
+  </footer>
+
+</body>
+</html>

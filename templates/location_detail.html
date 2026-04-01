@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ location }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <a class="back-link" href="{{ url_for('locations') }}">&larr; All Locations</a>
+  <h1>{{ location }}</h1>
+  <p class="subtitle">Cached statistics from SQLite &mdash; last computed {{ stats.computed_at.strftime('%Y-%m-%d') }}</p>
+</div>
+
+<section class="card-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ "{:,}".format(stats.total_records) }}</div>
+    <div class="stat-label">Total Records</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.avg_max_temp }}°C</div>
+    <div class="stat-label">Avg Max Temp</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.avg_min_temp }}°C</div>
+    <div class="stat-label">Avg Min Temp</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.rainy_day_pct }}%</div>
+    <div class="stat-label">Rainy Days</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.max_temp_ever }}°C</div>
+    <div class="stat-label">Record High</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.min_temp_ever }}°C</div>
+    <div class="stat-label">Record Low</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.avg_rainfall }} mm</div>
+    <div class="stat-label">Avg Daily Rainfall</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.avg_wind_speed }} km/h</div>
+    <div class="stat-label">Avg Wind Gust</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Rain Patterns</h2>
+  <div class="card-grid four-col">
+    <div class="mini-stat">
+      <span class="mini-val">{{ "{:,}".format(rain_patterns.rain_today) }}</span>
+      <span class="mini-lbl">Rained Today</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-val">{{ "{:,}".format(rain_patterns.rain_tomorrow) }}</span>
+      <span class="mini-lbl">Rain Tomorrow</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-val">{{ "{:,}".format(rain_patterns.consecutive_rain) }}</span>
+      <span class="mini-lbl">Consecutive Rain Days</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-val">{{ "{:,}".format(rain_patterns.total_days) }}</span>
+      <span class="mini-lbl">Total Days</span>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Analyse This Location</h2>
+  <a class="btn-primary" href="{{ url_for('analysis') }}?location={{ location }}">
+    Open in Analysis &rarr;
+  </a>
+</section>
+{% endblock %}

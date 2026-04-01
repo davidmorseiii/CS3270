@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Locations{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Locations</h1>
+  <p class="subtitle">Per location statistics cached in SQLite for fast access.</p>
+</div>
+
+<section class="card">
+  <div class="table-scroll">
+    <table class="data-table sortable">
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>Records</th>
+          <th>Avg Max Temp</th>
+          <th>Avg Min Temp</th>
+          <th>Avg Rainfall</th>
+          <th>Record High</th>
+          <th>Record Low</th>
+          <th>Rainy Days</th>
+          <th>Avg Wind (km/h)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in location_stats %}
+        <tr>
+          <td><a href="{{ url_for('location_detail', name=s.location) }}">{{ s.location }}</a></td>
+          <td>{{ "{:,}".format(s.total_records) }}</td>
+          <td>{{ s.avg_max_temp }}°C</td>
+          <td>{{ s.avg_min_temp }}°C</td>
+          <td>{{ s.avg_rainfall }} mm</td>
+          <td>{{ s.max_temp_ever }}°C</td>
+          <td>{{ s.min_temp_ever }}°C</td>
+          <td>{{ s.rainy_day_pct }}%</td>
+          <td>{{ s.avg_wind_speed }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
