@@ -33,6 +33,7 @@ from .visualization import (
     plot_temperature_range_trends,
     generate_all_plots_parallel
 )
+from .prediction import get_or_train_model, predict_rain, FEATURE_COLUMNS
 from .spark_analysis import (
     total_rainfall_df,
     max_temperature_df,
@@ -75,6 +76,9 @@ __all__ = [
     'plot_pressure_vs_rain',
     'plot_temperature_range_trends',
     'generate_all_plots_parallel',
+    'get_or_train_model',
+    'predict_rain',
+    'FEATURE_COLUMNS',
     'total_rainfall_df',
     'max_temperature_df',
     'min_temperature_df',

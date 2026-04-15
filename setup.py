@@ -17,5 +17,6 @@ setup(
         'pandas',
         'matplotlib',
         'seaborn',
+        'scikit-learn',
     ],
 )
