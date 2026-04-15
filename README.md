@@ -3,33 +3,15 @@ A semester long weather app project for CS 3270.
 
 ## Description
 
-### Module 9: 3 Tier Flask Web Application
-#### Developed a browser based 3 tier web application using Flask, Jinja2, SQLite, and SQLAlchemy.
+### Module 10: Predictive Modeling with scikit learn
+#### Machine learning rain prediction using scikit learn Pipelines.
 
-* **Three tier architecture:**
-  * **UI**: Browser based HTML/CSS interface with Jinja2 templates. User can filter records, browse locations, view the visualizations, and see query history.
-  * **Business Logic**: Flask routes and Python functions in `app.py` handle request processing, apply filters using my existing analysis modules and compute statistics on demand.
-  * **Data Access**: SQLite database via SQLAlchemy (`models.py`) stores two types of application data:
-    * **`QueryLog`** — analysis querys submitted through the UI.
-    * **`LocationStats`** — per location stats computed once and cached so not recomputed on every request.
-
-* **Pages:**
-  * **Dashboard** (`/`) — Overall dataset statistics, rain pattern summary, and recent query history.
-  * **Analysis** (`/analysis`) — Filter records by location, temp range, rainfall, and rain status. Shows matching statistics and a data table up to 200 rows.
-  * **Locations** (`/locations`) — Table of all 49 locations with cached statistics.
-  * **Location Detail** (`/location/<name>`) — Per location stats and rain patterns.
-  * **Visualizations** (`/visualizations`) — All six matplotlib charts from `static/img/`. "Regenerate" button re runs plot generation.
-  * **History** (`/history`) — Log of all queries stored in SQLite.
-
----
-### Module 8: PySpark Distributed Processing
-#### Implemented distributed data analysis with Apache PySpark on a 3 node cluster.
-
-* New features incorporated:
-  * **Distributed Analysis Functions**: Added `spark_analysis.py` with PySpark DataFrame equivilents of the main analysis functions.
-  * **Spark Job Entry Point**: Created `spark_job.py` for submitting work to Spark cluster via `spark-submit`.
-
-* Note: Module 9 does not require Spark and runs on a single machine.
+* **Models:**
+  * **Random Forest Classifier** — 100 estimators trained on 80% of all records shown with test set accuracy.
+  * **Logistic Regression** — comparison model. Both accuracies displayed on the Predictions page.
+* **Pipeline:** `SimpleImputer` (mean) > `StandardScaler` > classifier — handles columns with up to 48% missing values w/out dropping rows.
+* **Features:** 17 weather measurements — temperature, humidity, pressure, wind speed, cloud cover, rainfall, and binary RainToday flag.
+* **Page:** `/prediction` — displays model accuracy, ranked feature importance table, an interactive prediction form, and the predicted outcome with rain probability.
 
 ---
 #### Automated Tests List
@@ -123,6 +105,7 @@ CS3270/
 │   ├── data_cleaning.py            # Data validation
 │   ├── data_loader.py              # CSV loading (sync & async)
 │   ├── logger_config.py            # Logging setup
+│   ├── prediction.py               # scikit-learn rain prediction models
 │   ├── spark_analysis.py           # PySpark functions
 │   ├── visualization.py            # Plotting & filter/map/reduce functions
 │   └── weather_dataset.py          # WeatherDataset class
@@ -133,7 +116,8 @@ CS3270/
 │   ├── locations.html              # Location list
 │   ├── location_detail.html        # Per location detail
 │   ├── visualizations.html         # Charts page
-│   └── history.html                # Query history
+│   ├── history.html                # Query history
+│   └── prediction.html             # ML prediction page
 ├── static/
 │   ├── css/style.css               # Stylesheet
 │   └── img/                        # Generated plot images

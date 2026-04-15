@@ -21,6 +21,7 @@ from weather_analysis.visualization import (
     plot_pressure_vs_rain,
     plot_temperature_range_trends,
 )
+from weather_analysis.prediction import get_or_train_model, predict_rain, FEATURE_COLUMNS
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMG_DIR = os.path.join(BASE_DIR, 'static', 'img')
@@ -39,7 +40,7 @@ _locations = None
 
 
 def get_data():
-    """Return cached dataset and sorted location list, load if needed."""
+    """Return cached dataset and sorted location list, load if needed"""
     global _weather_data, _locations
     if _weather_data is None:
         _weather_data = load_weather_data(DATA_PATH)
@@ -56,7 +57,7 @@ def _numeric_avg(values):
 
 
 def _compute_overall_stats(data):
-    """Compute summary statistics for full or filtered dataset."""
+    """Compute summary statistics for full or filtreed dataset"""
     total = len(data)
     avg_max = _numeric_avg([r.get('MaxTemp') for r in data])
     avg_min = _numeric_avg([r.get('MinTemp') for r in data])
@@ -78,7 +79,7 @@ def _compute_overall_stats(data):
 
 
 def _get_or_cache_location_stats(location, data):
-    """Return LocationStats from DB cache. Compute and save if missing."""
+    """Return LocationStats from DB cache, compute and save if missing"""
     cached = LocationStats.query.filter_by(location=location).first()
     if cached:
         return cached
@@ -135,7 +136,7 @@ def _plots_exist():
 
 
 def _generate_plots(data):
-    """Generate all six visualizations into static/img/"""
+    """Generate visualizations into static/img/"""
     os.makedirs(IMG_DIR, exist_ok=True)
     plot_temperature_distribution(data, os.path.join(IMG_DIR, 'temperature_distribution.png'))
     plot_rainfall_patterns(data, os.path.join(IMG_DIR, 'rainfall_patterns.png'))
@@ -143,6 +144,12 @@ def _generate_plots(data):
     plot_wind_speed_distribution(data, os.path.join(IMG_DIR, 'wind_speed_distribution.png'))
     plot_pressure_vs_rain(data, os.path.join(IMG_DIR, 'pressure_vs_rain.png'))
     plot_temperature_range_trends(data, os.path.join(IMG_DIR, 'temperature_range_trends.png'))
+
+
+def get_model():
+    """Return trained prediction model, training on first call"""
+    data, _ = get_data()
+    return get_or_train_model(data)
 
 
 # Routes
@@ -295,6 +302,49 @@ def history():
         page=page, per_page=per_page, error_out=False
     )
     return render_template('history.html', pagination=pagination)
+
+
+@app.route('/prediction', methods=['GET', 'POST'])
+def prediction():
+    model = get_model()
+    prediction_result = None
+    form_values = {}
+    error = None
+
+    if request.method == 'POST':
+        feature_input = {}
+        for col in FEATURE_COLUMNS:
+            raw = request.form.get(col, '').strip()
+            if col == 'RainToday_bin':
+                feature_input[col] = int(raw) if raw in ('0', '1') else 0
+            else:
+                try:
+                    feature_input[col] = float(raw) if raw else None
+                except ValueError:
+                    feature_input[col] = None
+
+        try:
+            prediction_result = predict_rain(model, feature_input)
+        except Exception as e:
+            error = str(e)
+
+        entry = QueryLog(
+            query_type='prediction',
+            result_count=1 if prediction_result else 0,
+        )
+        db.session.add(entry)
+        db.session.commit()
+
+        form_values = {col: request.form.get(col, '') for col in FEATURE_COLUMNS}
+
+    return render_template(
+        'prediction.html',
+        model=model,
+        feature_columns=FEATURE_COLUMNS,
+        prediction_result=prediction_result,
+        form_values=form_values,
+        error=error,
+    )
 
 
 # App startup

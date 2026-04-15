@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Rain Prediction{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Rain Prediction</h1>
+  <p class="subtitle">RandomForest and Logistic Regression classifiers trained on Australian weather records. Leave any field blank to use the training-set average for that feature.</p>
+</div>
+
+<section class="card-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ "%.1f"|format(model.accuracy * 100) }}%</div>
+    <div class="stat-label">Random Forest Accuracy</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ "%.1f"|format(model.lr_accuracy * 100) }}%</div>
+    <div class="stat-label">Logistic Regression Accuracy</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ model.features | length }}</div>
+    <div class="stat-label">Features Used</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Feature Importances (Random Forest)</h2>
+  <p class="table-note">Ranked by mean decrease in impurity. Higher = more predictive.</p>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Importance</th>
+          <th>Relative Weight</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for name, score in model.importances %}
+        <tr>
+          <td>{{ name }}</td>
+          <td>{{ "%.4f"|format(score) }}</td>
+          <td>
+            <div style="background: var(--primary); height: 10px; border-radius: 4px;
+                        width: {{ (score / model.importances[0][1] * 100) | int }}%;
+                        min-width: 2px;"></div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Predict Tomorrow's Rain</h2>
+  <p class="table-note">Enter today's weather observations. Blank fields are imputed with training-set column means.</p>
+
+  <form method="POST" action="{{ url_for('prediction') }}" class="filter-form">
+
+    <div class="form-row">
+      {% for col in ['MinTemp', 'MaxTemp', 'Rainfall', 'Evaporation', 'Sunshine'] %}
+      <div class="form-group">
+        <label for="{{ col }}">{{ col }}</label>
+        <input type="number" step="0.1" name="{{ col }}" id="{{ col }}"
+               placeholder="optional" value="{{ form_values.get(col, '') }}" />
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-row">
+      {% for col in ['WindGustSpeed', 'WindSpeed9am', 'WindSpeed3pm', 'Humidity9am', 'Humidity3pm'] %}
+      <div class="form-group">
+        <label for="{{ col }}">{{ col }}</label>
+        <input type="number" step="0.1" name="{{ col }}" id="{{ col }}"
+               placeholder="optional" value="{{ form_values.get(col, '') }}" />
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-row">
+      {% for col in ['Pressure9am', 'Pressure3pm', 'Cloud9am', 'Cloud3pm', 'Temp9am', 'Temp3pm'] %}
+      <div class="form-group">
+        <label for="{{ col }}">{{ col }}</label>
+        <input type="number" step="0.1" name="{{ col }}" id="{{ col }}"
+               placeholder="optional" value="{{ form_values.get(col, '') }}" />
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="RainToday_bin">Rain Today?</label>
+        <select name="RainToday_bin" id="RainToday_bin">
+          <option value="0" {% if form_values.get('RainToday_bin') == '0' or not form_values %}selected{% endif %}>No</option>
+          <option value="1" {% if form_values.get('RainToday_bin') == '1' %}selected{% endif %}>Yes</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Predict</button>
+      <a href="{{ url_for('prediction') }}" class="btn-secondary">Reset</a>
+    </div>
+  </form>
+</section>
+
+{% if error %}
+<section class="card">
+  <p class="empty-msg">Error running model: {{ error }}</p>
+</section>
+{% endif %}
+
+{% if prediction_result is not none %}
+<section class="card">
+  <h2>Prediction Result</h2>
+  <div class="card-grid">
+    <div class="stat-card">
+      <div class="stat-value">
+        <span class="badge {% if prediction_result.label == 1 %}badge-rain{% else %}badge-dry{% endif %}">
+          {% if prediction_result.label == 1 %}Rain{% else %}No Rain{% endif %}
+        </span>
+      </div>
+      <div class="stat-label">Predicted Outcome</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ "%.1f"|format(prediction_result.probability_rain * 100) }}%</div>
+      <div class="stat-label">Probability of Rain</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ "%.1f"|format(prediction_result.probability_no_rain * 100) }}%</div>
+      <div class="stat-label">Probability of No Rain</div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
