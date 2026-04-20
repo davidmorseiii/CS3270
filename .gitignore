@@ -208,3 +208,9 @@ __marimo__/
 
 # Application logs
 logs/
+
+# Generated images
+*.png
+
+Database
+*.db
