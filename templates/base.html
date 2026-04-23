@@ -12,11 +12,18 @@
     <a class="brand" href="{{ url_for('index') }}">Weather Analysis</a>
     <ul class="nav-links">
       <li><a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>Dashboard</a></li>
+      <li><a href="{{ url_for('interactive_dashboard') }}" {% if request.endpoint == 'interactive_dashboard' %}class="active"{% endif %}>My Dashboard</a></li>
       <li><a href="{{ url_for('analysis') }}" {% if request.endpoint == 'analysis' %}class="active"{% endif %}>Analysis</a></li>
       <li><a href="{{ url_for('locations') }}" {% if request.endpoint in ('locations','location_detail') %}class="active"{% endif %}>Locations</a></li>
       <li><a href="{{ url_for('visualizations') }}" {% if request.endpoint == 'visualizations' %}class="active"{% endif %}>Visualizations</a></li>
       <li><a href="{{ url_for('history') }}" {% if request.endpoint == 'history' %}class="active"{% endif %}>History</a></li>
       <li><a href="{{ url_for('prediction') }}" {% if request.endpoint == 'prediction' %}class="active"{% endif %}>Predictions</a></li>
+      {% if current_user.is_authenticated %}
+      <li class="nav-user">
+        <span class="nav-username">{{ current_user.username }}</span>
+        <a href="{{ url_for('logout') }}" class="nav-logout">Logout</a>
+      </li>
+      {% endif %}
     </ul>
   </nav>
 

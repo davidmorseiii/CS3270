@@ -34,14 +34,17 @@ from .visualization import (
     generate_all_plots_parallel
 )
 from .prediction import get_or_train_model, predict_rain, FEATURE_COLUMNS
-from .spark_analysis import (
-    total_rainfall_df,
-    max_temperature_df,
-    min_temperature_df,
-    count_rainy_days_df,
-    analyze_rain_patterns_df,
-    temperature_range_stats_df,
-)
+try:
+    from .spark_analysis import (
+        total_rainfall_df,
+        max_temperature_df,
+        min_temperature_df,
+        count_rainy_days_df,
+        analyze_rain_patterns_df,
+        temperature_range_stats_df,
+    )
+except ImportError:
+    pass
 
 __all__ = [
     'load_weather_data',

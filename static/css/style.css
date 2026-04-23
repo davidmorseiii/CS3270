@@ -314,6 +314,198 @@ code {
   background: var(--surface);
 }
 
+/* Auth (login page) */
+
+.auth-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5);
+}
+
+.auth-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+.auth-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 1.75rem;
+}
+
+.auth-submit { width: 100%; padding: 0.65rem; font-size: 1rem; margin-top: 0.5rem; }
+
+.alert-error {
+  background: #2d1515;
+  border: 1px solid #7f1d1d;
+  color: #f87171;
+  border-radius: var(--radius);
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* Extend form control to direct inputs not just inside form group */
+.form-control {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  background: var(--surface);
+  color: var(--text);
+  width: 100%;
+  transition: border-color .15s;
+}
+.form-control:focus { outline: none; border-color: var(--primary); }
+
+/* Upload zone */
+
+.upload-zone {
+  position: relative;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.upload-zone:hover { border-color: var(--primary); background: #0e2233; }
+
+.upload-icon { font-size: 3rem; line-height: 1; color: var(--primary); }
+.upload-hint { color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem; }
+.upload-filename { color: var(--primary); font-size: 0.85rem; margin-top: 0.4rem; min-height: 1.2em; }
+
+.upload-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.column-list {
+  list-style: disc;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+/* Navbar user / logout */
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+.nav-username {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  padding: 0.6rem 0;
+}
+.nav-logout {
+  font-size: 0.83rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+.nav-logout:hover { color: #f87171; border-color: #7f1d1d; background: #2d1515; text-decoration: none; }
+
+/* Interactive dashboard */
+
+.category-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cat-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.1rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s, box-shadow .15s;
+  flex: 1;
+  min-width: 150px;
+}
+.cat-btn:hover { border-color: var(--primary); background: #0e2233; color: var(--primary); }
+.cat-btn.active {
+  border-color: var(--primary);
+  background: #0e2233;
+  color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(56,189,248,.25);
+}
+
+.cat-icon { font-size: 1.75rem; }
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.spinner-ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.summary-box {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* make dashboard plot img full width with spacing */
+#chartsContainer .plot-img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  display: block;
+  margin-bottom: 1.25rem;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .card-grid.four-col { grid-template-columns: repeat(2, 1fr); }

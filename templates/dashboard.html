@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Interactive Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Interactive Dashboard</h1>
+  <p class="subtitle" id="dashboardSubtitle">
+    Select a weather category to start exploring uploaded dataset.
+  </p>
+</div>
+
+<section class="card">
+  <h2>Weather Category</h2>
+  <div class="category-buttons">
+    <button class="cat-btn" data-category="temperature">
+      <span class="cat-icon">&#127777;</span>
+      Temperature Trends
+    </button>
+    <button class="cat-btn" data-category="rainfall">
+      <span class="cat-icon">&#127783;</span>
+      Rainfall Patterns
+    </button>
+    <button class="cat-btn" data-category="extreme">
+      <span class="cat-icon">&#127786;</span>
+      Extreme Weather
+    </button>
+  </div>
+</section>
+
+<section class="card" id="citySection" style="display:none">
+  <h2>Select City</h2>
+  <div class="form-group">
+    <label for="citySelect">City / Location</label>
+    <select id="citySelect" class="form-control">
+      <option value="">— Choose a city —</option>
+    </select>
+  </div>
+</section>
+
+<section class="card" id="resultsSection" style="display:none">
+  <div id="loadingSpinner" class="loading-spinner" style="display:none">
+    <div class="spinner-ring"></div>
+    <p>Loading charts&hellip;</p>
+  </div>
+  <div id="chartsContainer"></div>
+  <div id="summaryContainer" class="summary-box" style="display:none"></div>
+</section>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

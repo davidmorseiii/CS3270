@@ -1,13 +1,32 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 db = SQLAlchemy()
 
 
+class User(UserMixin, db.Model):
+    __tablename__ = 'user'
+
+    id            = db.Column(db.Integer, primary_key=True)
+    username      = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    def set_password(self, plaintext: str) -> None:
+        self.password_hash = generate_password_hash(plaintext)
+
+    def check_password(self, plaintext: str) -> bool:
+        return check_password_hash(self.password_hash, plaintext)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+
 class QueryLog(db.Model):
     """
-    Records the analysis querys submitted through UI
-    Provides searchable history of all user interactions.
+    Records analysis querys submitted through UI and provides searchable history of user interactions
     """
     __tablename__ = 'query_log'
 
@@ -27,8 +46,7 @@ class QueryLog(db.Model):
 
 class LocationStats(db.Model):
     """
-    Cache computed statistics /location so they arent recalculated
-    with every request. Invaildated if data is reloaded
+    Cache computed statistics /location so they arent recalculated with every request. Invaildated if data is reloaded
     """
     __tablename__ = 'location_stats'
 

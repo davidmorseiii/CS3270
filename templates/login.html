@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Weather Analysis CS3270</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="auth-body">
+
+  <div class="auth-card">
+    <h1 class="auth-title">Weather Analysis</h1>
+    <p class="auth-subtitle">CS3270 — Australian Weather Data</p>
+
+    {% if error %}
+    <div class="alert-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-control"
+          required
+          autofocus
+          autocomplete="username"
+        />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="form-control"
+          required
+          autocomplete="current-password"
+        />
+      </div>
+      <button type="submit" class="btn-primary auth-submit">Sign In</button>
+    </form>
+  </div>
+
+</body>
+</html>

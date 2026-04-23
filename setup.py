@@ -17,7 +17,11 @@ setup(
         'pandas',
         'matplotlib',
         'seaborn',
-        'pyspark'
+        'pyspark',
         'scikit-learn',
+        'flask-sqlalchemy',
+        'flask-login',
+        'setuptools',
+        'pytest',
     ],
 )

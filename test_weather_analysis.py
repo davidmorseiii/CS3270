@@ -509,6 +509,209 @@ class TestAggregateFunctions:
         assert result == 8.0
 
 
+# Auth, Upload, and Dashboard API tests
+
+import io
+import base64
+from app import app as flask_app
+from models import db, User
+
+
+@pytest.fixture
+def client():
+    """Flask test client with in memory SQLite DB and a seeded test user"""
+    flask_app.config['TESTING'] = True
+    flask_app.config['WTF_CSRF_ENABLED'] = False
+    flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    flask_app.config['SECRET_KEY'] = 'test-secret'
+
+    with flask_app.app_context():
+        db.drop_all()
+        db.create_all()
+        user = User(username='testuser')
+        user.set_password('testpass')
+        db.session.add(user)
+        db.session.commit()
+
+    with flask_app.test_client() as c:
+        yield c
+
+
+@pytest.fixture
+def auth_client(client):
+    """Test client already logged in as testuser."""
+    client.post('/login', data={'username': 'testuser', 'password': 'testpass'},
+                follow_redirects=False)
+    return client
+
+
+SAMPLE_CSV_CONTENT = (
+    b"Location,MinTemp,MaxTemp,Rainfall,RainToday,WindGustSpeed\n"
+    b"Sydney,15.0,28.5,0.0,No,45.0\n"
+    b"Sydney,14.2,32.1,5.2,Yes,60.0\n"
+    b"Melbourne,10.0,22.0,12.5,Yes,70.0\n"
+    b"Melbourne,8.5,18.3,0.0,No,35.0\n"
+    b"Adelaide,20.0,38.5,0.0,No,55.0\n"
+)
+
+
+class TestAuthLogic:
+    def test_user_password_hashing(self):
+        """set_password hashes the password; check_password validates it."""
+        with flask_app.app_context():
+            u = User(username='hashtest')
+            u.set_password('hunter2')
+            assert u.check_password('hunter2') is True
+            assert u.check_password('wrong') is False
+            assert u.password_hash != 'hunter2'
+
+    def test_login_valid_credentials(self, client):
+        """Correct credentials redirect to /upload."""
+        resp = client.post('/login', data={'username': 'testuser', 'password': 'testpass'})
+        assert resp.status_code == 302
+        assert '/upload' in resp.headers['Location']
+
+    def test_login_invalid_credentials(self, client):
+        """Wrong password stays on login page with an error."""
+        resp = client.post('/login', data={'username': 'testuser', 'password': 'wrongpass'})
+        assert resp.status_code == 200
+        assert b'Invalid username or password' in resp.data
+
+    def test_protected_routes_redirect_unauthenticated(self, client):
+        """All protected routes redirect to /login when not authenticated."""
+        for path in ['/', '/analysis', '/locations', '/dashboard']:
+            resp = client.get(path)
+            assert resp.status_code == 302, f'{path} should redirect'
+            assert '/login' in resp.headers['Location'], f'{path} should redirect to /login'
+
+    def test_logout_clears_session(self, auth_client):
+        """After logout, protected routes redirect to /login."""
+        resp = auth_client.get('/logout')
+        assert resp.status_code == 302
+        assert '/login' in resp.headers['Location']
+        resp2 = auth_client.get('/')
+        assert resp2.status_code == 302
+        assert '/login' in resp2.headers['Location']
+
+
+class TestCSVUploadValidation:
+    def _upload(self, client, content, filename='data.csv'):
+        return client.post(
+            '/upload',
+            data={'csv_file': (io.BytesIO(content), filename)},
+            content_type='multipart/form-data',
+        )
+
+    def test_upload_valid_csv(self, auth_client):
+        """Valid CSV with all required columns redirects to /dashboard."""
+        resp = self._upload(auth_client, SAMPLE_CSV_CONTENT)
+        assert resp.status_code == 302
+        assert '/dashboard' in resp.headers['Location']
+
+    def test_upload_missing_column(self, auth_client):
+        """CSV missing the Location column shows an error."""
+        bad = b"MinTemp,MaxTemp,Rainfall,RainToday\n10.0,25.0,0.0,No\n"
+        resp = self._upload(auth_client, bad)
+        assert resp.status_code == 200
+        assert b'Missing required columns' in resp.data or b'Location' in resp.data
+
+    def test_upload_empty_csv(self, auth_client):
+        """CSV with header only (no data rows) shows an error."""
+        header_only = b"Location,MinTemp,MaxTemp,Rainfall,RainToday\n"
+        resp = self._upload(auth_client, header_only)
+        assert resp.status_code == 200
+        assert b'no data rows' in resp.data.lower() or b'error' in resp.data.lower()
+
+    def test_upload_non_csv_extension(self, auth_client):
+        """Non-.csv file extension is rejected."""
+        resp = self._upload(auth_client, SAMPLE_CSV_CONTENT, filename='data.txt')
+        assert resp.status_code == 200
+        assert b'Only .csv' in resp.data
+
+    def test_upload_no_file(self, auth_client):
+        """Submitting the upload form with no file shows an error."""
+        resp = auth_client.post('/upload', data={}, content_type='multipart/form-data')
+        assert resp.status_code == 200
+        assert b'No file selected' in resp.data
+
+
+class TestDashboardAPI:
+    def _upload_sample(self, client):
+        client.post(
+            '/upload',
+            data={'csv_file': (io.BytesIO(SAMPLE_CSV_CONTENT), 'data.csv')},
+            content_type='multipart/form-data',
+        )
+
+    def test_api_cities_no_upload(self, auth_client):
+        """GET /api/cities without an uploaded CSV returns 400."""
+        resp = auth_client.get('/api/cities')
+        assert resp.status_code == 400
+        data = resp.get_json()
+        assert 'error' in data
+
+    def test_api_cities_returns_sorted_list(self, auth_client):
+        """After upload, /api/cities returns a sorted list of location names."""
+        self._upload_sample(auth_client)
+        resp = auth_client.get('/api/cities')
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert 'cities' in data
+        assert data['cities'] == sorted(data['cities'])
+        assert 'Sydney' in data['cities']
+        assert 'Melbourne' in data['cities']
+
+    def test_api_chart_invalid_category(self, auth_client):
+        """Invalid category query param returns 400."""
+        self._upload_sample(auth_client)
+        resp = auth_client.get('/api/chart?category=invalid&city=Sydney')
+        assert resp.status_code == 400
+
+    def test_api_chart_missing_city(self, auth_client):
+        """Missing city param returns 400."""
+        self._upload_sample(auth_client)
+        resp = auth_client.get('/api/chart?category=temperature')
+        assert resp.status_code == 400
+        data = resp.get_json()
+        assert 'City is required' in data['error']
+
+    def test_api_chart_unknown_city(self, auth_client):
+        """City not present in the data returns 404."""
+        self._upload_sample(auth_client)
+        resp = auth_client.get('/api/chart?category=temperature&city=Atlantis')
+        assert resp.status_code == 404
+
+    def test_api_chart_temperature_returns_charts(self, auth_client):
+        """Temperature category returns charts and a non-empty summary."""
+        self._upload_sample(auth_client)
+        resp = auth_client.get('/api/chart?category=temperature&city=Sydney')
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert 'charts' in data and len(data['charts']) >= 1
+        assert 'summary' in data and len(data['summary']) > 0
+        # each chart must be valid base64
+        for chart in data['charts']:
+            base64.b64decode(chart)  # raises if invalid
+
+    def test_api_chart_rainfall_category(self, auth_client):
+        """Rainfall category returns charts and summary."""
+        self._upload_sample(auth_client)
+        resp = auth_client.get('/api/chart?category=rainfall&city=Sydney')
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert 'charts' in data and len(data['charts']) >= 1
+        assert 'summary' in data and len(data['summary']) > 0
+
+    def test_api_chart_extreme_category(self, auth_client):
+        """Extreme weather category returns charts and summary."""
+        self._upload_sample(auth_client)
+        resp = auth_client.get('/api/chart?category=extreme&city=Sydney')
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert 'charts' in data and len(data['charts']) >= 1
+        assert 'summary' in data and len(data['summary']) > 0
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod(verbose=True)

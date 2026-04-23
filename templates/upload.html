@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Data{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Upload Weather Data</h1>
+  <p class="subtitle">Upload an Australian weather CSV to begin.</p>
+</div>
+
+{% if error %}
+<div class="alert-error">{{ error }}</div>
+{% endif %}
+
+<section class="card">
+  <h2>Select CSV File</h2>
+  <form method="POST" enctype="multipart/form-data" class="filter-form">
+    <div class="upload-zone" id="dropZone">
+      <div class="upload-icon">&#8679;</div>
+      <p class="upload-hint">Choose a CSV file or drag it here</p>
+      <p class="upload-filename" id="uploadFilename">No file selected</p>
+      <input
+        type="file"
+        name="csv_file"
+        id="csvFile"
+        accept=".csv"
+        required
+        class="upload-input"
+      />
+    </div>
+    <div class="form-actions" style="margin-top: 1.5rem;">
+      <button type="submit" class="btn-primary">Upload &amp; Analise</button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Required Columns</h2>
+  <p class="table-note">
+    The uploaded CSV must include the following columns (additional columns are ignored):
+  </p>
+  <ul class="column-list">
+    <li><code>Location</code> — City or region name</li>
+    <li><code>MinTemp</code> — Minimum daily temperature (°C)</li>
+    <li><code>MaxTemp</code> — Maximum daily temperature (°C)</li>
+    <li><code>Rainfall</code> — Daily rainfall (mm)</li>
+    <li><code>RainToday</code> — Whether it rained today (Yes/No)</li>
+  </ul>
+  <p class="table-note" style="margin-top: 0.75rem;">
+    Maximum file size: 50 MB. The standard
+    <em>Australian Weather Training Data.csv</em> file is fully compatible.
+  </p>
+</section>
+
+<script>
+  const input = document.getElementById('csvFile');
+  const label = document.getElementById('uploadFilename');
+  input.addEventListener('change', () => {
+    label.textContent = input.files[0] ? input.files[0].name : 'No file selected';
+  });
+</script>
+{% endblock %}
